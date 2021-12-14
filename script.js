@@ -113,13 +113,12 @@ const callbackReduce = (acumulador, currentValue, index, array) => {
     return acumulador += currentValue
 }
 
-const newReduce = (array, callReduce, valorInicial) => {
-    if(valorInicial === undefined){
-        let resultado = array[0]
+const newReduce = (array, callReduce, valorInicial = array[0]) => {
+    if(valorInicial === array[0]){
         for(let i = 1; i < array.length; i++){
-            resultado = callReduce(resultado, array[i], i, array)
+            valorInicial = callReduce(valorInicial, array[i], i, array)
         }
-        return resultado
+        return valorInicial
     }
     
     for(let i = 0; i < array.length; i++){
@@ -167,40 +166,26 @@ console.log(newEvery([3,4,5,6,7], callbackEvery))
 //fill
 let banana = ["maça", "maça", "mala", "chuva", "casa", "bola", "jogo"]
 
-const newFill = (array, valor, inicio, fim) =>{
-    if(!inicio){
-        for(let i = 0; i < array.length; i++){
+const newFill = (array, valor, inicio = 0, fim = array.length) =>{
+    
+    if(inicio >= 0 && fim >= 0){
+        for(let i = inicio; i < fim; i++){
             array[i] = valor
         }
-    } else if(inicio && !fim){
-        if(inicio > 0){
-            for(let i = inicio; i < array.length; i++){
-                array[i] = valor
-            }
-        } else{
-            for(let i = array.length + (inicio); i < array.length; i++){
-                array[i] = valor
-            }
+    } else if(inicio >= 0 && fim < 0){
+        for(let i = inicio; i < array.length + (fim); i++){
+            array[i] = valor
         }
-    } else{
-        if(inicio > 0 && fim > 0){
-            for(let i = inicio; i < fim; i++){
-                array[i] = valor
-            }
-        } else if(inicio > 0 && fim < 0){
-            for(let i = inicio; i < array.length + (fim); i++){
-                array[i] = valor
-            }
-        } else if(inicio < 0 && fim > 0){
-            for(let i = array.length + (inicio); i < fim; i++){
-                array[i] = valor
-            }
-        } else if(inicio < 0 && fim < 0){
-            for(let i = array.length + (inicio); i < array.length + (fim); i++){
-                array[i] = valor
-            }
+    } else if(inicio < 0 && fim >= 0){
+        for(let i = array.length + (inicio); i < fim; i++){
+            array[i] = valor
+        }
+    } else if(inicio < 0 && fim < 0){
+        for(let i = array.length + (inicio); i < array.length + (fim); i++){
+            array[i] = valor
         }
     }
+    
 }
 
 console.log(banana)
@@ -209,15 +194,8 @@ console.log(banana)
 
 //includes
 let things = ["maça", "livro", "mala", "chuva", "casa", "bola", "jogo"]
-const newIncludes = (array, searchElement, fromIndex) => {
-    if(!fromIndex){
-        for(let i = 0; i < array.length; i++){
-            if(array[i] === searchElement){
-                return true
-            }
-        }
-    }
-    if(fromIndex > 0){
+const newIncludes = (array, searchElement, fromIndex = 0) => {
+    if(fromIndex >= 0){
         for(let i = fromIndex; i < array.length; i++){
             if(array[i] === searchElement){
                 return true
@@ -238,16 +216,9 @@ const newIncludes = (array, searchElement, fromIndex) => {
 console.log(newIncludes(things, "chuva", -3))
 
 //indexOf
-const newIndexOf = (array, elementoDePesquisa, pontoInicial) => {
+const newIndexOf = (array, elementoDePesquisa, pontoInicial = 0) => {
 
-    if(!pontoInicial){
-        for(let i = 0; i < array.length; i++){
-            if(array[i] === elementoDePesquisa){
-                return i
-            }
-        }
-    }
-    if(pontoInicial > 0){
+    if(pontoInicial >= 0){
         for(let i = pontoInicial; i < array.length; i++){
             if(array[i] === elementoDePesquisa){
                 return i
@@ -269,57 +240,52 @@ console.log(newIndexOf(things, "chuva", -4))
 
 //concat
 let carros = ["fusca", "palio", "opala", "celta", "onix"]
-const newConcat = (...arrays) => {
-    let argumentos = [...arrays]
+const newConcat = (...valores) => {
+    let argumentos = [...valores]
 
     let tamanhos = []
 
     for(let i = 0; i < argumentos.length; i++){
-        tamanhos.push(argumentos[i].length)
+        if(Array.isArray(argumentos[i])){
+            tamanhos.push(argumentos[i].length)
+        }
     }
 
     let bigestArray = Math.max(...tamanhos)
     
     let newArray = []
     for(let i = 0; i < argumentos.length; i++){
-        for(let j = 0; j < bigestArray; j++){
-            if(argumentos[i][j] !== undefined){
-                newArray.push(argumentos[i][j])
+        if(Array.isArray(argumentos[i])){
+            for(let j = 0; j < bigestArray; j++){
+                if(argumentos[i][j] !== undefined){
+                    newArray.push(argumentos[i][j])
+                }
             }
+        } else{
+            newArray.push(argumentos[i])
         }
     }
 
     return newArray
 }
 
-console.log(newConcat(things, banana, carros))
+console.log(newConcat(things, banana, 1, carros, "batata", {cantora: "Aurora"}, "frita"))
 
 //join
-const newJoin = (array, separador) =>{
+const newJoin = (array, separador = ",") =>{
     let newString = ""
-    if(separador === undefined){
-        for(let i = 0; i < array.length; i++){
-            if(i === array.length - 1){
-                newString += `${array[i]}`
-            } else if(array[i] === undefined || array[i] === null){
-                newString += "" + ","
-            }else{
-                newString += `${array[i]},`
-            }
-        }
-    } else{
-        for(let i = 0; i < array.length; i++){
-            if(i === array.length - 1){
-                newString += `${array[i]}`
-            } else if(array[i] === undefined || array[i] === null){
-                newString += "" + separador
-            } else{
-                newString += `${array[i]}${separador}`
-            }
+    
+    for(let i = 0; i < array.length; i++){
+        if(i === array.length - 1){
+            newString += `${array[i]}`
+        } else if(array[i] === undefined || array[i] === null){
+            newString += "" + separador
+        } else{
+            newString += `${array[i]}${separador}`
         }
     }
     
-    if(array.length === 0){
+    if(!array.length){
         return ""
     }
     
